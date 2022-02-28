@@ -1,0 +1,9 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <!--<style name="Theme.HeartNHealth4U" parent="Theme.MaterialComponents.DayNight.DarkActionBar"> -->
+    <style name="Theme.HeartNHealth4U" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/color_white</item>
+    </style>
+</resources>

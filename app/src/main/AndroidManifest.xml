@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:adroid="http://schemas.android.com/apk/distribution"
+    package="de.lme.heartnhealth4u">
+
+    <!-- <uses-sdk android:minSdkVersion="10" /> -->
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+
+    <application
+        android:requestLegacyExternalStorage="true"
+        android:allowBackup="true"
+        android:icon="@drawable/h24u_rb"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.HeartNHealth4U">
+        <activity
+            android:name=".HeartyActivity"
+            android:exported="true">
+            <!--android:theme="@style/Theme.AppCompat.Light"-->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <service android:name="de.lme.heartnhealth4u.ShimmerSimService"
+            android:exported="true">
+            <intent-filter><action android:name="de.lme.heartnhealth4u.ShimmerSimService"></action>
+            </intent-filter>
+        </service>
+
+        <activity android:name=".AttachFeatureActivity"></activity>  <!-- Feature 메뉴 관련 activity-->
+        <activity android:name=".PrefActivity"></activity>           <!-- Setting 메뉴 관련 activity-->
+        <activity android:name=".DeviceListActivity"></activity>     <!-- Setting 메뉴 안 블루투스 연결 관련 activity-->
+
+    </application>
+
+</manifest>
