@@ -15,6 +15,7 @@ import android.graphics.Paint;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -528,14 +529,18 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 
 		try{
 			BufferedWriter bw = new BufferedWriter(new FileWriter(getFilesDir() + "buffer.txt",true));
-			bw.write("Hi");
+			bw.write("Hi~!");
 			bw.newLine();
 			bw.close();
 			Toast.makeText(this,"저장완료",Toast.LENGTH_SHORT).show();
-		} catch(IOException e) {
+		}catch(IOException e) {
 			e.printStackTrace();
 			Toast.makeText(this,e.getMessage(),Toast.LENGTH_SHORT).show();
 		}
+
+
+		
+
 
 
 
