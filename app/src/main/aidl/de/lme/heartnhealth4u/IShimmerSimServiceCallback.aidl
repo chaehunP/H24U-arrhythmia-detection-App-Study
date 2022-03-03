@@ -1,8 +1,7 @@
 package de.lme.heartnhealth4u;
-
-oneway interface IShimmerSimServiceCallback {
+ interface IShimmerSimServiceCallback {
     /**
      * Called when the service has a new value for you.
      */
-    void onShimmerSimEvent( int eventID, long timestamp, float sensorValue, char label );
+    oneway void onShimmerSimEvent( int eventID, long timestamp, float sensorValue, char label );
 }
