@@ -1,11 +1,11 @@
 package de.lme.heartnhealth4u;
 
 
-
-import androidx.appcompat.app.AppCompatActivity;
-import android.app.Activity;
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,6 +14,7 @@ import android.content.ServiceConnection;
 import android.graphics.Paint;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -29,13 +30,18 @@ import android.widget.GridView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.UUID;
 
 import de.lme.heartnhealth4u.PanTompkins.QRS;
 import de.lme.heartnhealth4u.PanTompkins.QRS.QrsArrhythmia;
@@ -51,7 +57,27 @@ import de.lme.plotview.PlotView.PlotViewGroup;
 import de.lme.plotview.SamplingPlot;
 
 
+
+
+
 public class HeartyActivity extends AppCompatActivity implements IShimmerSimServiceCallback {
+	private final String DEVICE_ADDRESS2="98:D3:34:90:B0:C9";
+	private final UUID PORT_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+	private BluetoothDevice device;
+	private BluetoothSocket socket;
+	private OutputStream outputStream;
+	private InputStream inputStream;
+	boolean deviceConnected=false;
+	Thread thread;
+	byte buffer[];
+	int bufferPosition;
+	boolean stopThread;
+	int pulse;
+	private String helpingHandContactNo;
+
+
+
+
 	public static final String TAG = ".HeartyActivity";
 
 	private static final int DIALOG_EXIT = 1;
@@ -358,12 +384,12 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 		}
 
 
-		public String format() {
+		public String format() {  // Test Record 와 판별할 mitbih.csv 파일을 Data Source에서 선택했을 때 아래 코드 실행, 판별 결과를 바로 보여줌
 			StringBuilder str = new StringBuilder();
 
 			finish();
 
-			str.append("Classification results\n[HeartNHealth4U] / [Reference]\nTP: ").append(numTP).append("\nTN: ")
+			str.append("판별 결과\n[Heart & Health For You] / [Reference]\nTP: ").append(numTP).append("\nTN: ")
 					.append(numTN).append("\nFP: ").append(numFP).append("\nFN: ").append(numFN)
 					.append("\n\nTotal Beats: ").append(numTotalBeats).append(" / ").append(numTotalBeatsRef)
 					.append("\nNormal: ").append(numNormal).append(" / ").append(numNormalRef).append("\nPVC: ")
@@ -378,7 +404,7 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 		}
 
 
-		public void save(Context con) {
+		public void save(Context con) {  // 블루투스 연결을 하여 ECG 값을 얻었을 때 해당하는 코드, 코드를 보면 외부 저장소에 만들어진 패키지명 폴더에 결과 값이 txt파일로 저장되는거 같음
 			File f = null;
 
 			try {
@@ -391,7 +417,7 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 				final StringBuilder sb = new StringBuilder(2048);
 
 
-				sb.append("Classification results\n[HeartNHealth4U] / [Reference]\nTP: ").append(numTP).append("\nTN: ")
+				sb.append("판별 결과\n[Heart & Health For You] / [Reference]\nTP: ").append(numTP).append("\nTN: ")
 						.append(numTN).append("\nFP: ").append(numFP).append("\nFN: ").append(numFN)
 						.append("\n\nTPBeats: ").append(numTPBeats).append("\nTNBeats: ").append(numTNBeats)
 						.append("\nFPBeats: ").append(numFPBeats).append("\nFNBeats: ").append(numFNBeats)
@@ -522,13 +548,67 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 	/**
 	 * Called when the activity is first created.
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.M)
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public  void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+		ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MODE_PRIVATE);
+
+		/*
+		//내부저장소에 패키지명 폴더 생성   앱을 실행하면 폴더가 만들어졌다는 토스트는 뜨지만 어디에도 없음
+		String dirPath = getFilesDir().getAbsolutePath();
+		File file = new File(dirPath, "/de.lme.heartnhealth4u/files");
+		// 일치하는 폴더가 없으면 생성
+		if( !file.exists() ) {
+			file.mkdirs();
+			Toast.makeText(this, "Success Folder ", Toast.LENGTH_SHORT).show();
+		}else {
+			Toast.makeText(this, "Already Folder ", Toast.LENGTH_SHORT).show();
+		}
+
+		String testStr = "ABCDEFGHIJK...";
+		File savefile = new File(dirPath+"/test.txt");
 		try{
-			BufferedWriter bw = new BufferedWriter(new FileWriter(getFilesDir() + "buffer.txt",true));
+			FileOutputStream fos = new FileOutputStream(savefile);
+			fos.write(testStr.getBytes());
+			fos.close();
+			Toast.makeText(this, "Save Success", Toast.LENGTH_SHORT).show();
+		} catch(IOException e){
+
+		}
+		*/
+
+
+
+
+		// 외부저장소 최상위 경로에 패키지명 폴더 생성   폴더는 생기지만 안에 데이터를 넣고 접근할 수 있게 맞춰줘도 반응이 없음
+		File appDirectory = new File(Environment.getExternalStorageDirectory(), "/de.lme.heartnhealth4u/files");
+		if (!appDirectory.exists()) {
+			appDirectory.mkdirs();
+			Toast.makeText(this, "Success Folder ", Toast.LENGTH_SHORT).show();
+		}else {
+			Toast.makeText(this, "Already Folder ", Toast.LENGTH_SHORT).show();
+		}
+
+
+
+		/*
+		File directory = new File(Context.getExternalFilesDir(null),"de.lme.heartnhealth4u");
+		if(!directory.mkdirs()) {
+			Log.d("file", "Directory was created");
+		}*/
+
+
+
+
+		//copyDatabase();
+
+		/*
+		//앱 패키지 경로 확인 용 - 내부 저장소 위치 -> data -> data -> 패키지 이름 -> files
+		try{
+			BufferedWriter bw = new BufferedWriter(new FileWriter(Environment.getExternalStorageDirectory() + "buffer.txt",true));
 			bw.write("Hi~!");
 			bw.newLine();
 			bw.close();
@@ -537,10 +617,7 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 			e.printStackTrace();
 			Toast.makeText(this,e.getMessage(),Toast.LENGTH_SHORT).show();
 		}
-
-
-		
-
+		*/
 
 
 
@@ -635,6 +712,36 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 
 		updatePlots();
 	}
+
+	/*  data/data/패키지/ 경로에 직접 files 폴더 만들기 -> 애초에 apk를 설치하는 걸로는 앱 패키지 경로가 만들어 지지 않음
+	private void copyDatabase() {
+		String DB_PATH = "/data/data/" + getApplicationContext().getPackageName() + "/files/";
+		String DB_NAME = "mitdb210ann";
+		String DB_NAME2 = "mitdb210sig";
+
+		try{ // 디렉토리가 없으면, 디렉토리를 먼저 생성한다.
+			 File fDir = new File( DB_PATH );
+			 if( !fDir.exists() ) { fDir.mkdir(); }
+
+			 String strOutFile = DB_PATH + DB_NAME;
+			 InputStream inputStream = getApplicationContext().getAssets().open( DB_NAME );
+			 OutputStream outputStream = new FileOutputStream( strOutFile );
+
+			 byte[] mBuffer = new byte[1024];
+			 int mLength;
+			 while( ( mLength = inputStream.read( mBuffer) ) > 0 ) {
+			 	outputStream.write( mBuffer, 0, mLength );
+			 }
+
+			 outputStream.flush();
+			 outputStream.close();
+			 inputStream.close();
+		}catch( Exception e ) {
+			e.printStackTrace();
+		}
+	}
+*/
+
 
 
 	/* (non-Javadoc)

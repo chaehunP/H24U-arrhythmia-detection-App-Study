@@ -18,9 +18,10 @@ import de.lme.plotview.SamplingPlot;
 
 /**
  * Implements the Pan-Tompkins QRS detection algorithm, including futher processing steps like template matching.
- * 
+ *
+ * 템플릿 일치와 같은 추가 처리 단계를 포함하여 Pan-Tompkins QRS 감지 알고리즘을 구현합니다.
+ *
  * @author sistgrad
- * 
  */
 public class PanTompkins extends LmeFilter
 {
@@ -92,49 +93,68 @@ public class PanTompkins extends LmeFilter
 
 		public enum QrsClass
 		{
-			/** Rejection class */
+			/** Rejection class   거부 클래스 */
 			UNKOWN,
-			/** No valid QRS complex, probably detection failure */
+
+			/** No valid QRS complex, probably detection failure   유효한 QRS 콤플렉스 없음, 감지 실패 가능성 있음 */
 			INVALID,
-			/** Normal QRS morphology */
+
+			/** Normal QRS morphology   정상적인 QRS 형태 */
 			NORMAL,
-			/** Premature Ventricular Contraction recognized in QRS (cc small) */
+
+			/** Premature Ventricular Contraction recognized in QRS (cc small)   QRS에서 인식되는 조기 심실 수축(cc small) */
 			PVC,
-			/** PVC like aberrant beat (cc very small) */
+
+			/** PVC like aberrant beat (cc very small) PVC와 같은 비정상 비트(cc 매우 작음)*/
 			PVC_ABERRANT,
-			/** Bundle branch block (q->s > 130ms) */
+
+			/** Bundle branch block (q->s > 130ms)    번들 분기 블록(q->s > 130ms)*/
 			BB_BLOCK,
-			/** Various escape beats (> 600ms no QRS) */
+
+			/** Various escape beats (> 600ms no QRS)   다양한 탈출 비트(> 600ms QRS 없음) */
 			ESCAPE,
-			/** Atrial premature complexes/beats */
+
+			/** Atrial premature complexes/beats   심방 조기 수축 */
 			APC,
-			/** Aberrated atrial premature beats */
+
+			/** Aberrated atrial premature beats    비정상적인 심방 조기 박동*/
 			APC_ABERRANT,
-			/** Various premature beats, unspecified, possibly junctional premature */
+
+			/** Various premature beats, unspecified, possibly junctional premature    다양한 조기 박동, 상세불명, 아마도 접합부 조기 박동*/
 			PREMATURE,
-			/** waveform differs significantly, potentially a/v flutter or fibrillation (cc < 0.4) */
+
+			/** waveform differs significantly, potentially a/v flutter or fibrillation (cc < 0.4)    파형이 크게 다름, 잠재적으로 a/v 플러터 또는 세동(cc < 0.4)*/
 			ABERRANT,
-			/** Virtual beats, inserted for missed beats */
+
+			/** Virtual beats, inserted for missed beats    놓친 비트에 삽입된 가상 비트*/
 			VIRTUAL
 		}
 
 		public enum QrsArrhythmia
 		{
-			/** no arrhythmia, normal pace */
+			/** no arrhythmia, normal pace   부정맥 없음, 정상 속도 */
 			NONE,
-			/** Very likely a normal beat, shows several deviations, but not enough to classify as ectopic */
+
+			/** Very likely a normal beat, shows several deviations, but not enough to classify as ectopic
+			    정상 박동일 가능성이 매우 높고 몇 가지 편차를 보이지만 이소성으로 분류하기에는 충분하지 않습니다. */
 			ARTIFACT,
-			/** Fusion of two beats (rr < 0.65 * prev && no APC) */
+
+			/** Fusion of two beats (rr < 0.65 * prev && no APC)    두 비트의 융합(rr < 0.65 * prev && no APC)*/
 			FUSION,
-			/** atrioventricular block, generic (rr > 1.6 * prev => ESCAPE if nothing else) */
+
+			/** atrioventricular block, generic (rr > 1.6 * prev => ESCAPE if nothing else)   방실 차단, 일반(rr > 1.6 * prev  => 다른 것이 없으면 ESCAPE) */
 			AV_BLOCK,
+
 			/** Heart rate > 130 bpm */
 			TACHYCARDIA,
+
 			/** Heart rate < 40 bpm */
 			BRADYCARDIA,
-			/** a/v flutter or fibrillation (ABERRANT && rr <<) */
+
+			/** a/v flutter or fibrillation (ABERRANT && rr <<)   a/v 플러터 또는 세동(이상 && rr <<) */
 			FIBRILLATION,
-			/** Heart failure */
+
+			/** Heart failure    심장 마비*/
 			CARDIAC_ARREST
 		}
 

@@ -72,6 +72,8 @@ public class DataSource {
 	 *            The scaling factor to multiply each sample with. Default
 	 *            is 1. Setting this to 0 will result in a
 	 *            InvalidParameterException.
+	 *
+	 *            각 샘플을 곱할 배율 인수입니다. 기본값은 1입니다. 이것을 0으로 설정하면 잘못된 매개변수 예외.
 	 */
 	public int load(String signalFile, String annotationFile,
 		int maxSamples, int leadColumn, int scale) {
@@ -97,7 +99,7 @@ public class DataSource {
 		    // estimate the sizes
 		    size = fs.length() / 3;
 		} else {
-		    reader = new BufferedReader(new FileReader(fs));
+		    reader = new BufferedReader(new FileReader(fs));  // sig파일 읽기
 		    // estimate the sizes
 		    size = fs.length() >> 3;
 		}

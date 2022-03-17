@@ -99,7 +99,7 @@ public class LmeFilter {
     private transient int t_iter = 0;
 
     /**
-     * Performs the filtering operation for the next x value.
+     * Performs the filtering operation for the next x value.   다음 x 값에 대한 필터링 작업을 수행합니다.
      * 
      * @param xnow
      *            x[n]
@@ -134,7 +134,7 @@ public class LmeFilter {
     }
 
     /**
-     * @return The current y[0] value from last calculation step
+     * @return The current y[0] value from last calculation step   마지막 계산 단계의 현재 y[0] 값
      */
     public double current() {
 	return y[0];
@@ -199,7 +199,7 @@ public class LmeFilter {
     /**
      * Represents a statistical object tp keep track of running mean, min and
      * max values.
-     * 
+     * 평균, 최소값 및 최대값을 계속 추적하는 통계 개체를 나타냅니다.
      * @author sistgrad
      * 
      */
@@ -217,7 +217,7 @@ public class LmeFilter {
 	}
 
 	/**
-	 * Stop increasing the num counter at maxNum values.
+	 * Stop increasing the num counter at maxNum values.   maxNum 값에서 num 카운터 증가를 중지합니다.
 	 * 
 	 * @param maxNum
 	 */
@@ -310,7 +310,10 @@ public class LmeFilter {
      * peak-decision for the previous value. The very first and second call ever
      * made to next() after creating the object will, in this exemplary case,
      * always return <code>Double.NaN</code>.
-     * 
+     *
+	 * next()는 항상 minRange의 중심 값에 대한 피크 결정을 반환합니다.
+	 * minRange == 3이면 next()에 대한 세 번째 호출은 이전 값에 대한 피크 결정을 반환합니다.
+	 * 객체 생성 후 next()에 대한 첫 번째 및 두 번째 호출은 이 예시적인 경우 항상 <code>Double.NaN</code>을 반환합니다.
      * 
      * @author sistgrad
      * 
@@ -324,10 +327,10 @@ public class LmeFilter {
 
 	/**
 	 * @param minRange
-	 *            range of surrounding values to test against for peak
+	 *            range of surrounding values to test against for peak     피크 평가를 위해 테스트할 주변 값의 범위(>= 1이어야 함)
 	 *            evaluation (must be >= 1)
 	 * @param minDiff
-	 *            minimal (absolute) difference between two values to be
+	 *            minimal (absolute) difference between two values to be   서로 다른 것으로 간주되는 두 값 사이의 최소(절대) 차이
 	 *            considered different
 	 */
 	public PeakDetectionFilter(int minRange, double minDiff) {
@@ -363,7 +366,7 @@ public class LmeFilter {
 	}
 
 	/**
-	 * resets blocking to reuse the filter
+	 * resets blocking to reuse the filter   필터를 재사용하기 위해 차단 재설정
 	 */
 	public void reset() {
 	    block = x.length;
@@ -375,6 +378,9 @@ public class LmeFilter {
 	 * @return Double.NaN, if not part of a peak, peakIdx will also be set
 	 *         to -1. Or the value of the peak, if it IS part of a peak.
 	 *         this.peakIdx will contain the current index of said peak.
+	 *
+	 *         Double.NaN, 피크의 일부가 아닌 경우 peakIdx도 -1로 설정됩니다. 또는 피크의 일부인 경우 피크 값입니다.
+	 *         this.peakIdx는 해당 피크의 현재 인덱스를 포함합니다.
 	 */
 	@Override
 	public double next(double xnow) {

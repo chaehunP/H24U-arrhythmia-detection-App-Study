@@ -5,9 +5,9 @@ package de.lme.heartnhealth4u;
 
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.DeadObjectException;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -26,7 +26,6 @@ import de.lme.heartnhealth4u.ShimmerDataSource.State;
 import de.lme.plotview.Plot;
 import de.lme.plotview.Plot.PlotStyle;
 import de.lme.plotview.SamplingPlot;
-import de.lme.heartnhealth4u.DataSource;
 
 /**
  * Data delivery service for EGC signal samples. The samples are acquired either by connecting to a SHIMMER node via
@@ -274,9 +273,9 @@ public class ShimmerSimService extends Service implements OnShimmerDataListener
 					// ====>  // Data Source에서 "simall"이나 "번호"를 선택했을 경우 실행
 					else if (m_con.simMode == SHIM_MODE_LIVE || m_con.simMode == SHIM_MODE_SIMULATION)  // SHIM_MODE_LIVE int형 0, SHIM-MODE_SIMULATION int형 1
 					{
-						File sigFile = new File( ShimmerSimService.this.getFilesDir(), "mitdb" + m_con.dataSource
+						File sigFile = new File(Environment.getExternalStorageDirectory(), "mitdb" + m_con.dataSource
 								+ "sig.csv" );
-						File annFile = new File( ShimmerSimService.this.getFilesDir(), "mitdb" + m_con.dataSource
+						File annFile = new File(Environment.getExternalStorageDirectory(), "mitdb" + m_con.dataSource
 								+ "ann.csv" );
 						// load MIT-BIH Database record if not already in memory
 						// 아직 메모리에 없는 경우 MIT-BIH 데이터베이스 레코드 로드

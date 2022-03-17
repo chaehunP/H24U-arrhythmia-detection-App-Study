@@ -7,7 +7,6 @@
 	<item android:id="@+id/add_feat" android:icon="@drawable/ic_menu_set_as" android:title="@string/menuAttachFeature"></item>
 	<item android:id="@+id/add_plot" android:icon="@drawable/ic_menu_manage" android:title="@string/menuAttachPlot"  ></item>
 	<item android:id="@+id/sound" android:icon="@drawable/ic_menu_notifications" android:title="@string/menuSoundDisable" android:checkable="true" ></item>
-	
 	</menu>
 
 

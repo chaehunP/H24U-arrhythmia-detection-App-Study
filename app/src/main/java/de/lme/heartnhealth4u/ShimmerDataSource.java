@@ -157,6 +157,7 @@ public abstract class ShimmerDataSource
 
 	/**
 	 * Returns a human-readable name for this data source (e.g. bluetooth name, filename, etc...)
+	 * 이 데이터 소스에 대해 사람이 읽을 수 있는 이름을 반환합니다(예: 블루투스 이름, 파일 이름 등...)
 	 * 
 	 * @return String containing the name.
 	 */
