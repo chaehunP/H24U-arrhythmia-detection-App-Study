@@ -166,8 +166,8 @@ public class ShimmerSimService extends Service implements OnShimmerDataListener
 	 * @see android.app.Service#onBind(android.content.Intent)
 	 */
 	@Override
-	public IBinder onBind (Intent intent)
-	{
+	public IBinder onBind (Intent intent)  // IBinder는 서비스와 컴포넌트 사이에서 인터페이스 역할, 컴포넌트가 서비스에게 연결요청을 시도하면, 서비스는 IBinder를 반환하여 서비스 자신과 통신할 수 있도록 한다.
+	{                                      // Service 객체와 (화면단 Activity 사이에서) 데이터를 주고받을 때 사용하는 메서드
 		synchronized (m_con)
 		{
 			// copy sim mode
@@ -185,14 +185,16 @@ public class ShimmerSimService extends Service implements OnShimmerDataListener
 				// error
 				return null;
 			}
-
+			// Settings의 기능별 초기값
 			m_con.dataColumn = intent.getIntExtra( INTENT_EXTRA_DATA_COL, 2 );
 			m_con.dataMultiplier = intent.getIntExtra( INTENT_EXTRA_DATA_MULT, 1000 );
 			m_con.simCount = intent.getIntExtra( INTENT_EXTRA_DATA_COUNT, 0 );
 
 			Log.d( TAG, "Connecting: " + m_con.dataSource + " via " + m_con.simMode );
+			//Toast.makeText(this,"\"Connecting: "+ m_con.dataSource +" via "+ m_con.simMode,Toast.LENGTH_SHORT).show();
 
 			// check for bluetooth request and return binder only if bt-com can be established
+			// bt-com을 설정할 수 있는 경우에만 블루투스 요청을 확인하고 바인더를 반환합니다.
 			if (m_con.simMode == SHIM_MODE_BLUETOOTH)
 			{
 				if (m_con.connectBluetooth( m_shimManager ) == false)
@@ -258,7 +260,7 @@ public class ShimmerSimService extends Service implements OnShimmerDataListener
 					{
 						// load internal test record(ecgpvc)
 						simPlot = new SamplingPlot( "ECG", Plot.generatePlotPaint(), PlotStyle.LINE, 20000 );
-						// simPlot.loadFromFile( this, this.getResources().openRawResource( R.raw.ecg_ex ) );
+						// simP0lot.loadFromFile( this, this.getResources().openRawResource( R.raw.ecg_ex ) );
 						simPlot.loadFromFile(	ShimmerSimService.this,
 												ShimmerSimService.this.getResources().openRawResource( R.raw.mitdb210 ) );
 						simDelay = 5f;
@@ -273,10 +275,13 @@ public class ShimmerSimService extends Service implements OnShimmerDataListener
 					// ====>  // Data Source에서 "simall"이나 "번호"를 선택했을 경우 실행
 					else if (m_con.simMode == SHIM_MODE_LIVE || m_con.simMode == SHIM_MODE_SIMULATION)  // SHIM_MODE_LIVE int형 0, SHIM-MODE_SIMULATION int형 1
 					{
-						File sigFile = new File(Environment.getExternalStorageDirectory(), "mitdb" + m_con.dataSource
+//						ShimmerSimService.this.getFilesDir() -> data/data/de.lme.heartnhealth4u, 내부 저장소 파일 접근
+//						Environment.getExternalStorageDirectory().getAbsolutePath() -> 앱 외부 절대 경로
+						File sigFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "mitdb" + m_con.dataSource
 								+ "sig.csv" );
-						File annFile = new File(Environment.getExternalStorageDirectory(), "mitdb" + m_con.dataSource
+						File annFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "mitdb" + m_con.dataSource
 								+ "ann.csv" );
+
 						// load MIT-BIH Database record if not already in memory
 						// 아직 메모리에 없는 경우 MIT-BIH 데이터베이스 레코드 로드
 						if (simSignal == null || !simSignal.recordName.equals( sigFile.getAbsolutePath() ))

@@ -25,8 +25,9 @@ import java.security.InvalidParameterException;
 import de.lme.plotview.FloatValueList;
 
 /**
- * Implementation of a filtering algorithm using numerator and denominator
- * coefficients.
+ * Implementation of a filtering algorithm using numerator and denominator coefficients.
+ *
+ * 분자 및 분모 계수를 사용한 필터링 알고리즘 구현.
  * 
  * @author Stefan Gradl
  */
@@ -41,21 +42,20 @@ public class LmeFilter {
 
     /**
      * @param b_taps
-     *            numerator coefficients
+     *            numerator coefficients   분자 계수
      * @param a_taps
-     *            denominator coefficients, can be null. if not null, a[0] must
-     *            not be 0 or an {@link InvalidParameterException} will be
-     *            thrown.
+     *            denominator coefficients, can be null. if not null, a[0] must not be 0 or an {@link InvalidParameterException} will be thrown.
+	 *            분모 계수는 null일 수 있습니다. null이 아닌 경우 a[0]은 0이 아니어야 합니다. 그렇지 않으면 {@link InvalidParameterException}이 발생합니다.
      */
     public LmeFilter(double[] b_taps, double[] a_taps) {
-	// make sure the coefficients are valid
+	// make sure the coefficients are valid    계수가 유효한지 확인하십시오.
 	if (b_taps == null || b_taps.length < 1
 		|| (b_taps.length == 1 && b_taps[0] == 0)
 		|| (a_taps != null && a_taps[0] == 0)) {
 	    throw new InvalidParameterException();
 	}
 
-	// copy denominators
+	// copy denominators    분모 복사
 	if (a_taps == null) {
 	    a = new double[1];
 	    a[0] = 1d;
@@ -64,7 +64,7 @@ public class LmeFilter {
 	    System.arraycopy(a_taps, 0, a, 0, a_taps.length);
 	}
 
-	// copy numerators
+	// copy numerators    분자 복사
 	b = new double[b_taps.length];
 	System.arraycopy(b_taps, 0, b, 0, b_taps.length);
 
@@ -165,7 +165,7 @@ public class LmeFilter {
 
 	/**
 	 * Stop increasing the num counter at maxNum values.
-	 * 
+	 * maxNum 값에서 num 카운터 증가를 중지합니다.
 	 * @param maxNum
 	 */
 	public MeanFilter(int maxNum) {
@@ -390,23 +390,23 @@ public class LmeFilter {
 	    peakValue = Double.NaN;
 	    peakIdx = -1;
 
-	    // block until the buffer is filled entirely
+	    // block until the buffer is filled entirely    버퍼가 완전히 채워질 때까지 차단
 	    if (block > 0) {
 		--block;
 		return Double.NaN;
 	    }
 
 	    for (_i = 1; _i <= minRange; ++_i) {
-		// values before mid-value
+		// values before mid-value   중간 값 이전의 값
 		if (x[minRange] - minDiff <= x[minRange + _i])
 		    return Double.NaN;
 
-		// values after mid-value
+		// values after mid-value   중간 값 이후의 값
 		if (x[minRange] - minDiff < x[minRange - _i])
 		    return Double.NaN;
 	    }
 
-	    // value IS part of a peak
+	    // value IS part of a peak   값은 피크의 일부입니다.
 	    peakValue = x[minRange];
 	    peakIdx = minRange;
 
@@ -415,15 +415,18 @@ public class LmeFilter {
     }
 
     /**
-     * Implements a <i>minimum detection</i> filter.
+     * Implements a <i>minimum detection</i> filter.     <i>최소 감지</i> 필터를 구현합니다.
      * 
      * next() will always return the peak-decision for the central value of
      * minRange. If minRange == 3 then the third call to next() returns the
      * peak-decision for the previous value. The very first and second call ever
      * made to next() after creating the object will, in this exemplary case,
      * always return <code>Double.NaN</code>.
-     * 
-     * 
+	 *
+	 * next()는 항상 minRange의 중심 값에 대한 피크 결정을 반환합니다.
+	 * minRange == 3이면 next()에 대한 세 번째 호출은 이전 값에 대한 피크 결정을 반환합니다.
+	 * 객체 생성 후 next()에 대한 첫 번째 및 두 번째 호출은 이 예시적인 경우 항상 <code>Double.NaN</code>을 반환합니다.
+     *
      * @author sistgrad
      * 
      */
@@ -454,7 +457,7 @@ public class LmeFilter {
 	    peakValue = Double.NaN;
 	    peakIdx = -1;
 
-	    // block until the buffer is filled entirely
+	    // block until the buffer is filled entirely    버퍼가 완전히 채워질 때까지 차단
 	    if (block > 0) {
 		--block;
 		return Double.NaN;

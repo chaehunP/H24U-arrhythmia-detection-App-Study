@@ -44,6 +44,8 @@ import de.lme.plotview.PlotView;
 /**
  * Handles all supported data sources.
  * 
+ * 모든 Settings 의 Data Source를 다루기 위한 클래스
+ * 
  * @author Stefan Gradl; Patrick Kugler
  * 
  */
@@ -56,7 +58,7 @@ public class DataSource {
 	public String recordName;
 	public SparseIntArray labels = new SparseIntArray(8192);
 
-	/**
+	/**  WFDB는 physionet에서 제공하는 MIT-BIH 데이터를 사용하기 위해 필요한 라이브러리
 	 * Loads a WFDB ECG csv converted signal and annotation file.
 	 * 
 	 * @param signalFile
@@ -64,10 +66,11 @@ public class DataSource {
 	 * @param annotationFile
 	 *            The csv-converted annotation file.
 	 * @param maxSamples
-	 *            The maximal number of samples to load. Setting this to
-	 *            <code>0</code> loads all samples.
+	 *            The maximal number of samples to load. Setting this to <code>0</code> loads all samples.
+	 *            로드할 최대 샘플 수입니다. 이것을 <code>0</code>으로 설정하면 모든 샘플이 로드됩니다.
 	 * @param leadColumn
 	 *            The column number (starting at 1) of the desired lead.
+	 *            원하는 리드의 열 번호(1부터 시작).
 	 * @param scale
 	 *            The scaling factor to multiply each sample with. Default
 	 *            is 1. Setting this to 0 will result in a
@@ -93,9 +96,7 @@ public class DataSource {
 
 		// is gzip m_file?
 		if (signalFile.endsWith(".gz")) {
-		    reader = new BufferedReader(new InputStreamReader(
-			    new GZIPInputStream(new BufferedInputStream(
-				    new FileInputStream(fs)))));
+		    reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new BufferedInputStream(new FileInputStream(fs)))));
 		    // estimate the sizes
 		    size = fs.length() / 3;
 		} else {
@@ -106,18 +107,17 @@ public class DataSource {
 
 		recordName = signalFile;
 
-		// preallocate value arrays
+		// preallocate value arrays  값 배열을 미리 할당
 		vals1 = new ArrayList<Float>((int) size);
 
-		// initialize string (line) splitter
-		TextUtils.SimpleStringSplitter splitter = new TextUtils.SimpleStringSplitter(
-			',');
+		// initialize string (line) splitter 문자열 라인을 ,로 구분 
+		TextUtils.SimpleStringSplitter splitter = new TextUtils.SimpleStringSplitter(',');
 		String line = null;
 
-		// skip header lines
+		// skip header lines  헤더 라인은 스킵
 		reader.readLine();
 
-		// read sampling interval
+		// read sampling interval  샘플링의 간격 읽기
 		line = reader.readLine();
 		splitter.setString(line);
 		if (splitter.hasNext()) {
@@ -136,7 +136,7 @@ public class DataSource {
 		    }
 		}
 
-		// if invalid, reset to default
+		// if invalid, reset to default   유효하지 않은 경우 기본값으로 재설정
 		if (sampleInterval < 0)
 		    sampleInterval = 0.00277778f;
 
@@ -145,8 +145,8 @@ public class DataSource {
 		    // split
 		    splitter.setString(line);
 
-		    try {
-			// ==============> iterate columns
+		    try { 
+			// ==============> iterate columns  열 반복
 			currentColumn = 1;
 			for (String split : splitter) {
 			    if (currentColumn == leadColumn) {
@@ -259,6 +259,8 @@ public class DataSource {
 
     /**
      * Creates a new DataSource from the given path.
+	 *
+	 * 지정된 경로에서 새 Data Source 를 만듭니다.
      * 
      * @param path
      */
@@ -267,24 +269,27 @@ public class DataSource {
     }
 
     /**
-     * Creates a Plot1D by loading the given text (gzipped) m_file, separating
-     * at delimiter and using the given columns.
-     * 
+     * Creates a Plot1D by loading the given text (gzipped) m_file, separating at delimiter and using the given columns.
+     * 지정된 텍스트(gzipped) m_file을 로드하여 구분 기호로 구분하고 지정된 열을 사용하여 Plot1D를 만듭니다.
      * @param filePath
-     *            File to load. Must be a textfile but can be gzipped.
+     *            File to load. Must be a text file but can be gzipped.
+	 *            로드할 파일입니다. 텍스트 파일이어야 하지만 gzip으로 압축할 수 있습니다.
      * @param delimiter
      *            Character at which to separate the columns.
+	 *            열을 구분할 문자입니다.
      * @param firstColumn
-     *            Index of the first column to use for the x values (starting
-     *            from 1)
+     *            Index of the first column to use for the x values (starting from 1)
+	 *            x 값에 사용할 첫 번째 열의 인덱스(1부터 시작)
      * @param secondColumn
-     *            Index of the second column to use for the Plot values
-     *            (starting from 2, must be > firstColumn)
+     *            Index of the second column to use for the Plot values (starting from 2, must be > firstColumn)
+	 *            플롯 값에 사용할 두 번째 열의 인덱스(2부터 시작, > first Column 이어야 함)
      * @param numHeaderLines
      *            Number of header lines to skip.
+	 *            건너뛸 헤더 행의 수입니다.
      * @param progressListener
      *            (AsyncTask) object listener the progress is updated to
      * @return A Plot1D object ready to use.
+	 * 			  (AsyncTask) 객체 리스너는 사용할 준비가 된 Plot1D 객체로 진행률이 업데이트됩니다.
      */
     public static Plot1D create(String filePath, char delimiter,
 								int firstColumn, int secondColumn, int numHeaderLines,
@@ -307,9 +312,7 @@ public class DataSource {
 
 	    // is gzip m_file?
 	    if (filePath.endsWith(".gz")) {
-		reader = new BufferedReader(new InputStreamReader(
-			new GZIPInputStream(new BufferedInputStream(
-				new FileInputStream(f)))));
+		reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new BufferedInputStream(new FileInputStream(f)))));
 		// estimate the sizes
 		size = f.length() >> 1;
 	    } else {
@@ -323,13 +326,12 @@ public class DataSource {
 		return null;
 	    }
 
-	    // preallocate value arrays
+	    // preallocate value arrays   값 배열을 미리 할당
 	    vals1 = new ArrayList<Long>((int) size);
 	    vals2 = new ArrayList<Float>((int) size);
 
 	    // initialize string (line) splitter
-	    TextUtils.SimpleStringSplitter splitter = new TextUtils.SimpleStringSplitter(
-		    delimiter);
+	    TextUtils.SimpleStringSplitter splitter = new TextUtils.SimpleStringSplitter(delimiter);
 	    String line = null;
 
 	    // skip header lines
@@ -347,7 +349,7 @@ public class DataSource {
 		splitter.setString(line);
 
 		try {
-		    // ==============> iterate columns
+		    // ==============> iterate columns  열 반복
 		    currentColumn = 1;
 		    for (String split : splitter) {
 			if (currentColumn == firstColumn) {
@@ -382,10 +384,7 @@ public class DataSource {
 	    }
 	    // <=============
 
-		 Log.d( PlotView.TAG,
-		 String.format( "Plot1D.create loaded %d and %d values.",
-		 vals1.size(),
-		 vals2.size() ) );
+		 Log.d( PlotView.TAG, String.format( "Plot1D.create loaded %d and %d values.", vals1.size(), vals2.size() ) );
 	    if (progressListener != null)
 		progressListener.onUpdateProgress((int) (size + 3));
 

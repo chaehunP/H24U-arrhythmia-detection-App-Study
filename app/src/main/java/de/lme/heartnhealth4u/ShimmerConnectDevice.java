@@ -10,10 +10,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
+// 일반 블루투스 기기 연결, HC-06 등
 
 class ShimmerConnectDevice extends ShimmerDataSource
 {
-	private static final UUID		SPP_UUID	= UUID.fromString( "00001101-0000-1000-8000-00805F9B34FB" );
+	 private static final UUID SPP_UUID					= UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); // 스마트폰 - 아두이노 간 데이터 전송 시 사용하는 범용 고유 식별자
+
+	 //private static final UUID 		NG_NOTIFY_CHARACTERISTIC_UUID 		= UUID.fromString("34802252-7185-4d5d-b431-630e7050e8f0");   // unknown characteristic
+	 //private static final UUID 		NG_SERVICE_UUID 					= UUID.fromString("61353090-8231-49cc-b57a-886370740041");   // unknown service
+	 //private static final UUID 		NG_WRITE_CHARACTERISTIC_UUID 		= UUID.fromString("17816557-5652-417f-909f-3aee61e5fa85");   // unknown characteristic
+
+
 
 	// @formatter:off
     private static final byte SHIMMER_DATA_PACKET = (byte) 0x00,
@@ -46,7 +53,7 @@ class ShimmerConnectDevice extends ShimmerDataSource
 	private static final int		BUFFER_SIZE			= 512;
 
 	private final BluetoothDevice	mmDevice;
-	private BluetoothSocket			mmSocket;
+	private BluetoothSocket			mmSocket, mmSocket1, mmSocket2, mmSocket3;
 	private InputStream				mmInStream;
 	private OutputStream			mmOutStream;
 	private Thread					mmThread;
@@ -71,11 +78,11 @@ class ShimmerConnectDevice extends ShimmerDataSource
 		mBufferFillCount = 0;
 	}
 
-
 	public String getID ()
 	{
 		return mmID;
 	}
+
 
 
 	public void connect ()
@@ -84,9 +91,32 @@ class ShimmerConnectDevice extends ShimmerDataSource
 		{
 			mmSocket = mmDevice.createRfcommSocketToServiceRecord( SPP_UUID );
 
+			//mmSocket1 = mmDevice.createRfcommSocketToServiceRecord(NG_NOTIFY_CHARACTERISTIC_UUID);
+			//mmSocket2 = mmDevice.createRfcommSocketToServiceRecord(NG_SERVICE_UUID);
+			//mmSocket3 = mmDevice.createRfcommSocketToServiceRecord(NG_WRITE_CHARACTERISTIC_UUID);
+
+
 			mmSocket.connect();
 
-			mmInStream = mmSocket.getInputStream();
+
+
+			//mmSocket1.connect();
+			//mmSocket2.connect();
+			//mmSocket3.connect();
+
+
+
+
+			//mmInStream = mmSocket1.getInputStream();
+			//mmOutStream = mmSocket1.getOutputStream();
+			//mmInStream = mmSocket2.getInputStream();
+			//mmOutStream = mmSocket2.getOutputStream();
+			//mmInStream = mmSocket3.getInputStream();
+			//mmOutStream = mmSocket3.getOutputStream();
+
+
+
+			mmInStream = mmSocket.getInputStream();  // 블루투스기기로 부터 받은 데이터
 			mmOutStream = mmSocket.getOutputStream();
 
 			SystemClock.sleep( 500 );
@@ -104,6 +134,13 @@ class ShimmerConnectDevice extends ShimmerDataSource
 			try
 			{
 				mmSocket.close();
+
+
+				//mmSocket1.close();
+				//mmSocket2.close();
+				//mmSocket3.close();
+
+
 			}
 			catch (IOException closeException)
 			{}
@@ -131,6 +168,14 @@ class ShimmerConnectDevice extends ShimmerDataSource
 		try
 		{
 			mmSocket.close();
+
+
+			//mmSocket1.close();
+			//mmSocket2.close();
+			//mmSocket3.close();
+
+
+
 			setState( State.DISCONNECTED );
 		}
 		catch (IOException e)
@@ -192,11 +237,13 @@ class ShimmerConnectDevice extends ShimmerDataSource
 					else
 					{
 						System.arraycopy( buffer, 0, mBuffer, mBufferWritePos, (BUFFER_SIZE - mBufferWritePos) );
-						System.arraycopy( buffer, (BUFFER_SIZE - mBufferWritePos), mBuffer, 0, bytes
-								- (BUFFER_SIZE - mBufferWritePos) );
+						System.arraycopy( buffer, (BUFFER_SIZE - mBufferWritePos), mBuffer, 0, bytes - (BUFFER_SIZE - mBufferWritePos) );
+
+						//final String data = new String(buffer,0,bytes);  현재 버퍼에 저장된 데이터를 data 변수에 String 형태로 저장
+
 					}
 
-					mBufferWritePos = (mBufferWritePos + bytes) % BUFFER_SIZE;
+					mBufferWritePos = (mBufferWritePos + bytes) % BUFFER_SIZE;  // System.arraycopy을 이용하여 mBufferWritePos에 받은 값 저장
 					mBufferFillCount = mBufferFillCount + bytes;
 				}
 			}

@@ -8,19 +8,19 @@ package de.lme.plotview;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.RectF;
 import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
+import android.graphics.Path;
+import android.graphics.RectF;
+import android.os.Environment;
 import android.text.TextUtils.SimpleStringSplitter;
 import android.text.format.Time;
 import android.util.Log;
-import de.lme.plotview.Plot.PlotAxis;
-import de.lme.plotview.Plot.PlotMarker;
-import de.lme.plotview.Plot.PlotStyle;
-import de.lme.plotview.PlotView.PlotProgressListener;
-import de.lme.plotview.PlotView.PlotScrollPolicy;
-import de.lme.plotview.PlotView.PlotSurface;
+
+import junit.framework.Assert;
+
+import org.apache.commons.lang3.BooleanUtils;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,9 +34,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.zip.GZIPInputStream;
-import junit.framework.Assert;
 
-import org.apache.commons.lang3.BooleanUtils;
+import de.lme.plotview.PlotView.PlotProgressListener;
+import de.lme.plotview.PlotView.PlotScrollPolicy;
+import de.lme.plotview.PlotView.PlotSurface;
 
 public class Plot1D extends Plot {
     public LongValueList x;
@@ -318,10 +319,10 @@ public class Plot1D extends Plot {
                 if (this.m_file.charAt(0) == File.separatorChar) {
                     f = new File(this.m_file);
                 } else {
-                    f = new File(con.getExternalFilesDir((String)null), this.m_file);
+                    f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), this.m_file);
                 }
             } else {
-                f = new File(filePath);
+                f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), this.m_file);
             }
 
             FileWriter fw = new FileWriter(f, true);

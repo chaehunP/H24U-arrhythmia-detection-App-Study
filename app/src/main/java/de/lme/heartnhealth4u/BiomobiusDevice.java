@@ -9,10 +9,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
+// 쉬머 장비 연결 용
 
 class BiomobiusDevice extends ShimmerDataSource
 {
-	private static final UUID		SPP_UUID	= UUID.fromString( "00001101-0000-1000-8000-00805F9B34FB" );
+	private static final UUID		SPP_UUID	= UUID.fromString( "00001101-0000-1000-8000-00805F9B34FB" );  // 스마트폰 - 아두이노 간 데이터 전송 시 사용하는 범용 고유 식별자
+
+
 
 	// @formatter:off
     private static final byte SHIMMER_FRAMING_BOF = (byte) 0xC0,
@@ -20,7 +23,7 @@ class BiomobiusDevice extends ShimmerDataSource
 	    SHIMMER_START_TRANSFER = (byte) 0x07,
 	    SHIMMER_STOP_TRANSFER = (byte) 0x20,
 	    SHIMMER_PACKET_SIZE = (byte) 0x16;
- // @formatter:on
+ 	// @formatter:on
 
 	private static final int		BUFFER_SIZE			= 512;
 
@@ -35,6 +38,7 @@ class BiomobiusDevice extends ShimmerDataSource
 	private byte[]					mBuffer;
 	private int						mBufferWritePos;
 	private int						mBufferFillCount;
+
 
 
 	public BiomobiusDevice (BluetoothDevice device)
@@ -60,9 +64,11 @@ class BiomobiusDevice extends ShimmerDataSource
 	{
 		try
 		{
-			mmSocket = mmDevice.createRfcommSocketToServiceRecord( SPP_UUID );
+			mmSocket = mmDevice.createRfcommSocketToServiceRecord( SPP_UUID ); // createRfcommSocketToServiceRecord(uuid) 함수를 이용하여 원격 블루투스 장치와 통신할 수 있는 소켓 생성
 
-			mmSocket.connect();
+
+			mmSocket.connect(); // 소켓이 생성 되면 connect() 함수를 호출함으로써 두기기의 연결은 완료
+
 
 			mmInStream = mmSocket.getInputStream();
 			mmOutStream = mmSocket.getOutputStream();
@@ -74,6 +80,9 @@ class BiomobiusDevice extends ShimmerDataSource
 			try
 			{
 				mmSocket.close();
+
+
+
 			}
 			catch (IOException closeException)
 			{}
@@ -101,6 +110,9 @@ class BiomobiusDevice extends ShimmerDataSource
 		try
 		{
 			mmSocket.close();
+
+
+
 			setState( State.DISCONNECTED );
 		}
 		catch (IOException e)
