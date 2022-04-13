@@ -275,7 +275,7 @@ public class ShimmerSimService extends Service implements OnShimmerDataListener
 					// ====>  // Data Source에서 "simall"이나 "번호"를 선택했을 경우 실행
 					else if (m_con.simMode == SHIM_MODE_LIVE || m_con.simMode == SHIM_MODE_SIMULATION)  // SHIM_MODE_LIVE int형 0, SHIM-MODE_SIMULATION int형 1
 					{
-//						ShimmerSimService.this.getFilesDir() -> data/data/de.lme.heartnhealth4u, 내부 저장소 파일 접근
+//						ShimmerSimService.this.getFilesDir() -> data/data/de.lme.heartnhealth4u, 내부 저장소 파일 접근, 임의로 사용자가 컨트롤 안됨
 //						Environment.getExternalStorageDirectory().getAbsolutePath() -> 앱 외부 절대 경로
 						File sigFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "mitdb" + m_con.dataSource
 								+ "sig.csv" );
