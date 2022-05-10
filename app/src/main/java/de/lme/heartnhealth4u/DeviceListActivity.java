@@ -87,6 +87,8 @@ public class DeviceListActivity extends Activity
 		mPairedDevicesArrayAdapter = new ArrayAdapter< String >( this, R.layout.device_name );
 		mNewDevicesArrayAdapter = new ArrayAdapter< String >( this, R.layout.device_name );
 
+
+
 		// Find and set up the ListView for paired devices    페어링된 장치에 대한 ListView 찾기 및 설정
 		ListView pairedListView = (ListView) findViewById( R.id.paired_devices );
 		pairedListView.setAdapter( mPairedDevicesArrayAdapter );
@@ -167,13 +169,15 @@ public class DeviceListActivity extends Activity
 
 		// Request discover from BluetoothAdapter    BluetoothAdapter에서 검색 요청
 		mBtAdapter.startDiscovery();
+
+
+
 	}
 
 
 	// The on-click listener for all devices in the ListViews
 	private OnItemClickListener		mDeviceClickListener	= new OnItemClickListener() {
-																public void onItemClick (AdapterView< ? > av, View v, int arg2,
-																		long arg3)
+																public void onItemClick (AdapterView< ? > av, View v, int arg2, long arg3)
 																{
 																	// Cancel discovery because it's costly and we're about to connect
 																	// 비용이 많이 들고 연결하려고 하므로 검색을 취소합니다.

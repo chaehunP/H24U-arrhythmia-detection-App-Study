@@ -4,14 +4,11 @@
 package de.lme.heartnhealth4u;
 
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
-import android.util.Log;
-import de.lme.heartnhealth4u.PanTompkins.QRS.QrsArrhythmia;
-import de.lme.heartnhealth4u.PanTompkins.QRS.QrsClass;
-import de.lme.heartnhealth4u.PanTompkins.QRS.SegmentationStatus;
 import de.lme.plotview.FloatValueList;
-import de.lme.heartnhealth4u.LmeFilter;
 import de.lme.plotview.ObjectValueList;
 import de.lme.plotview.SamplingPlot;
 
@@ -40,8 +37,7 @@ public class PanTompkins extends LmeFilter
 
 	/** HIGH-PASS filter */
 	public static final double	hp_a[]			= { 1d, 1d };
-	public static final double	hp_b[]			= { -0.03125d, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1d, -1d, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.03125d };
+	public static final double	hp_b[]			= { -0.03125d, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1d, -1d, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.03125d };
 	public LmeFilter			highpass		= new LmeFilter( hp_b, hp_a );
 
 	/** DIFF filter */

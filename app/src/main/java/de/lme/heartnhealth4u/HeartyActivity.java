@@ -4,8 +4,6 @@ package de.lme.heartnhealth4u;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,7 +14,6 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -37,11 +34,8 @@ import androidx.core.app.ActivityCompat;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.UUID;
 
 import de.lme.heartnhealth4u.PanTompkins.QRS;
 import de.lme.heartnhealth4u.PanTompkins.QRS.QrsArrhythmia;
@@ -60,23 +54,10 @@ import de.lme.plotview.SamplingPlot;
 
 
 
+
 public class HeartyActivity extends AppCompatActivity implements IShimmerSimServiceCallback {
-	private final UUID PORT_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");  // 스마트폰 - 아두이노 간 데이터 전송 UUID
-	private BluetoothDevice device;
-	private BluetoothSocket socket;
-	private OutputStream outputStream;
-	private InputStream inputStream;
-	boolean deviceConnected=false;
-	Thread thread;
-	byte buffer[];
-	int bufferPosition;
-	boolean stopThread;
-	int pulse;
-	private String helpingHandContactNo;
 
-	private String mBufferWritePos;
-
-
+//	private BluetoothSPP bt;
 
 
 	public static final String TAG = ".HeartyActivity";
@@ -165,6 +146,7 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 
 		public int numOthersRef = 0;
 		public int numOthers = 0;
+		private de.lme.heartnhealth4u.PanTompkins Pan;
 
 
 		public SimResult(String name) {
@@ -300,7 +282,9 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 			// count total beats
 			++numTotalBeats;
 
-			Log.d("newBeat", "[" + currentLabel + " - " + beat.classification);
+			Log.d("newBeat", "[" + currentLabel + " - " + beat.classification+"]");
+
+//			Toast.makeText(getApplicationContext(),beat.classification,Toast.LENGTH_SHORT).show();
 
 			// don't count anything else while learning
 			if (de.lme.heartnhealth4u.PanTompkins.learning)
@@ -335,8 +319,7 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 							// non-ectopic are undetectable in the channel we parse
 
 							// fused beats are ignored at this stage as they are checked in reverse for the last beat
-						else if (currentLabel != 'x' && currentLabel != 'S' && currentLabel != 'A' && currentLabel != 'a'
-								&& currentLabel != 'f') {
+						else if (currentLabel != 'x' && currentLabel != 'S' && currentLabel != 'A' && currentLabel != 'a' && currentLabel != 'f') {
 							++numFN;
 						}
 					}
@@ -385,7 +368,7 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 		}
 
 
-		public String format() {  // Test Record 와 판별할 mitbih.csv 파일을 Data Source에서 선택했을 때 아래 코드 실행, 판별 결과를 바로 보여줌
+		public String format() {  // Test Record 와 판별할 MIT-BIH.csv 파일을 Data Source에서 선택했을 때 아래 코드 실행, 판별 결과를 바로 보여줌
 			StringBuilder str = new StringBuilder();
 
 			finish();
@@ -411,7 +394,7 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 			//Context CSV_NAME = con;
 			//String fileName = (CSV_NAME + (new SimpleDateFormat("_yyyy.MM.dd_HH.mm")).format(Calendar.getInstance().getTime()) + ".csv");
 				try {
-					f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "db_" + simName + "_result.txt");
+					f = new File( con.getExternalFilesDir( null ), "db_" + simName + "_result.txt" );
 //					con.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
 					finish();
 
@@ -488,6 +471,7 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 		/**
 		 * Initializes the mappings with the default entries.
 		 *
+		 * .
 		 * 기본 항목으로 매핑을 초기화합니다.
 		 *
 		 * @param con
@@ -500,7 +484,7 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 					"text", "sup", "sub"}, new int[]{R.id.imgItem, R.id.lblValue, R.id.lblText, R.id.lblValueSup,
 					R.id.lblValueSub});
 
-			gridAdapter2 = new SimpleAdapter(con,gridAdapterMap,R.layout.feature_list_item,new String[]{"value","text"}, new int[]{R.id.lblValue, R.id.lblText});
+			gridAdapter2 = new SimpleAdapter(con,gridAdapterMap,R.layout.feature_list_item,new String[]{"value","text"}, new int[]{R.id.lblValue,R.id.lblText});
 
 			modifyMapping("hr", "n/a", "n/a", "n/a", R.drawable.stat_notify_sync_error, "HR [bpm]");
 			modifyMapping("rr", "n/a", "n/a", "n/a", R.drawable.stat_sys_warning, "RR [ms]");
@@ -509,7 +493,7 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 			modifyMapping("num", "n/a", "n/a", "n/a", R.drawable.stat_sys_warning, "Beats [#]");
 
 
-			//modifyMapping2("data","n/a","DATA");
+			modifyMapping2("data","n/a","QRS-Threshold");
 		}
 
 
@@ -576,7 +560,11 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 				if (text != null)
 					map.put("text", text);
 			}
+			if (gridAdapter != null)
+				gridAdapter.notifyDataSetChanged();
 		}
+
+
 	}
 
 
@@ -593,7 +581,6 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 		
 		// 앱 시작 시 폰 저장소에 저장활 수 있도록 허가 묻는 코드
 		ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MODE_PRIVATE);
-
 
 
 		/*  data/data/패키지/ 경로에 직접 files 폴더 만들기 -> 애초에 apk를 설치하는 걸로는 앱 패키지 경로가 만들어 지지 않음
@@ -665,6 +652,7 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 		*/
 
 
+
 		/*
 		File directory = new File(Context.getExternalFilesDir(null),"de.lme.heartnhealth4u");
 		if(!directory.mkdirs()) {
@@ -692,9 +680,10 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 
 
 
-		getSupportActionBar().setDisplayShowHomeEnabled(true); // 타이틀바에 이미지 추가
-		getSupportActionBar().setDisplayUseLogoEnabled(true);
-		getSupportActionBar().setIcon(R.drawable.h24u);        // 타이틀바에 이미지 추가
+		//getSupportActionBar().setDisplayShowHomeEnabled(true); // 타이틀바에 이미지 추가
+		//getSupportActionBar().setDisplayUseLogoEnabled(true);
+		//getSupportActionBar().setIcon(R.drawable.h24u);        // 타이틀바에 이미지 추가
+
 
 
 
@@ -784,7 +773,74 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 		m_toneGen = new ToneGenerator(AudioManager.STREAM_MUSIC, 40);
 
 		updatePlots();
+
+
+
+//		bt = new BluetoothSPP(this); //Initializing
+//
+//		TextView rtd = findViewById(R.id.RealTimeData);
+//		//rtd.setText(String.valueOf());
+//
+//		if (!bt.isBluetoothAvailable()) { //블루투스 사용 불가
+//			Toast.makeText(getApplicationContext(), "Bluetooth is not available", Toast.LENGTH_SHORT).show();
+//			finish();
+//		}
+//
+//		bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() { //데이터 수신
+//			public void onDataReceived(byte[] data, String message) {
+//				rtd.setText(message);
+//			}
+//		});
+//
+//		bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener() { //연결됐을 때
+//			public void onDeviceConnected(String name, String address) {
+//				Toast.makeText(getApplicationContext(), "Connected to " + name + "\n" + address, Toast.LENGTH_SHORT).show();
+//			}
+//
+//			public void onDeviceDisconnected() { //연결해제
+//				Toast.makeText(getApplicationContext(), "Connection lost", Toast.LENGTH_SHORT).show();
+//			}
+//
+//			public void onDeviceConnectionFailed() { //연결실패
+//				Toast.makeText(getApplicationContext(), "Unable to connect", Toast.LENGTH_SHORT).show();
+//			}
+//		});
+//
+//		Button btnConnect = findViewById(R.id.btnConnect); //연결시도
+//		btnConnect.setOnClickListener(new View.OnClickListener() {
+//			public void onClick(View v) {
+//				if (bt.getServiceState() == BluetoothState.STATE_CONNECTED) {
+//					bt.disconnect();
+//				} else {
+//					Intent intent = new Intent(getApplicationContext(), DeviceListActivity.class);  // spp 라이브리에 있는 DeviceList.class를 intent를 이용하여 구현
+//					startActivityForResult(intent, BluetoothState.REQUEST_CONNECT_DEVICE);  //  구현한 intent를 결과 화면으로 표시
+//				}
+//			}
+//		});
+
 	}
+
+//	public void onStart() {
+//		super.onStart();
+//		if (!bt.isBluetoothEnabled()) { //
+//			Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//			startActivityForResult(intent, BluetoothState.REQUEST_ENABLE_BT);
+//		} else {
+//			if (!bt.isServiceAvailable()) {
+//				bt.setupService();
+//				bt.startService(BluetoothState.DEVICE_OTHER); //DEVICE_ANDROID는 안드로이드 기기 끼리
+//			}
+//		}
+//	}
+//
+//	public void setup() {
+//		Button btnSend = findViewById(R.id.btnSend); //데이터 전송
+//		btnSend.setOnClickListener(new View.OnClickListener() {
+//			public void onClick(View v) {
+//				bt.send("Text", true);
+//			}
+//		});
+//	}
 
 
 	/* (non-Javadoc)
@@ -826,14 +882,19 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 	 * @see android.app.Activity#onActivityResult(int, int, android.content.Intent)
 	 */
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == RESULT_FEATURE) {
+	protected void onActivityResult (int requestCode, int resultCode, Intent data)
+	{
+		if (requestCode == RESULT_FEATURE)
+		{
 
-		} else if (requestCode == RESULT_PLOT) {
+		}
+		else if (requestCode == RESULT_PLOT)
+		{
 			updatePlots();
 		}
-		super.onActivityResult(requestCode, resultCode, data);
+		super.onActivityResult( requestCode, resultCode, data );
 	}
+
 
 
 	/**
@@ -898,14 +959,19 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 	public boolean onOptionsItemSelected(MenuItem item) {  // Menu Item을 선택하였을 때 호출되어 Item 객체가 넘어온다.
 		// Handle item selection  기능을 다룰 항목명 선택
 		switch (item.getItemId()) {
-			case R.id.add_feat:  // Menu in Features
-				startActivityForResult(new Intent(this, AttachFeatureActivity.class), RESULT_FEATURE);
-				Toast.makeText(this, "특징", Toast.LENGTH_SHORT).show();
-				return true;
+//			case R.id.add_feat:  // Menu in Features
+//				startActivityForResult(new Intent(this, AttachFeatureActivity.class), RESULT_FEATURE);
+//				Toast.makeText(this, "특징", Toast.LENGTH_SHORT).show();
+//				return true;
 
 			case R.id.add_plot:  // Menu in Settings
 				startActivityForResult(new Intent(this, de.lme.heartnhealth4u.PrefActivity.class), RESULT_PLOT);
 				Toast.makeText(this, "설정", Toast.LENGTH_SHORT).show();
+				return true;
+
+			case R.id.Real_Time_Data:
+				Intent intent = new Intent(this,Realtimedata.class);
+				startActivity(intent);
 				return true;
 
 			case R.id.test:  // Menu in Test Record ,앱 자체에 내장된 데이터를 이용하여 판별
@@ -919,8 +985,7 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 				// try to connect
 				if (connectShim()) {
 					Toast.makeText(this,
-							"서비스에 연결되었습니다... 데이터를 로드하는 중입니다. 기다려주십시오. 데이터세트 크기에 따라 최대 1분이 소요될 수 있습니다.",
-							Toast.LENGTH_LONG).show();
+							"서비스에 연결되었습니다...  데이터를 로드하는 중입니다."+"\n"+"잠시만 기다려주십시오. 데이터세트 크기에 따라 최대 1분이 소요될 수 있습니다.", Toast.LENGTH_LONG).show();
 				} else {
 					Toast.makeText(this, "Error: Could not connect to ShimmerService!", Toast.LENGTH_LONG).show();
 				}
@@ -978,7 +1043,7 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 					// try to connect
 					if (connectShim()) {
 						Toast.makeText(this,
-								"서비스에 연결되었습니다... 데이터를 로드하는 중입니다. 기다려주십시오. 데이터세트 크기에 따라 최대 1분이 소요될 수 있습니다.",
+								"서비스에 연결되었습니다...  데이터를 불러오는 중입니다."+"\n"+"데이터 크기에 따라 최대 1분이 소요될 수 있습니다.",
 								Toast.LENGTH_LONG).show();
 					} else {
 						Toast.makeText(this, "Error: Could not connect to ShimmerService!", Toast.LENGTH_LONG).show();
@@ -1063,9 +1128,7 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 										.putExtra( de.lme.heartnhealth4u.ShimmerSimService.INTENT_EXTRA_DATA_SOURCE, m_con.dataSource )
 										.putExtra( de.lme.heartnhealth4u.ShimmerSimService.INTENT_EXTRA_DATA_COL, m_con.dataColumn )
 										.putExtra( de.lme.heartnhealth4u.ShimmerSimService.INTENT_EXTRA_DATA_MULT, m_con.dataMultiplier )
-										.putExtra( de.lme.heartnhealth4u.ShimmerSimService.INTENT_EXTRA_DATA_COUNT, m_con.simCount ),
-								mConnection,
-								Context.BIND_AUTO_CREATE ))
+										.putExtra( de.lme.heartnhealth4u.ShimmerSimService.INTENT_EXTRA_DATA_COUNT, m_con.simCount ), mConnection, Context.BIND_AUTO_CREATE ))
 		{
 			m_isConnected = true;
 
@@ -1362,8 +1425,8 @@ public class HeartyActivity extends AppCompatActivity implements IShimmerSimServ
 											m_pants.qrstaStats.formatMin(),
 											null,
 											null );
-
-				ViewFeatures.modifyMapping2("data",mBufferWritePos,null);
+//				String.valueOf(m_pants.qrsThreshold)
+				ViewFeatures.modifyMapping2("data",String.valueOf(m_pants.qrsThreshold),null);
 
 
 				if (m_result != null)

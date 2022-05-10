@@ -20,7 +20,7 @@ public class ShimmerManager extends Object
 	}
 
 
-	private final String DEVICE_ADDRESS1="0C:8C:DC:38:93:7E";
+	//private final String DEVICE_ADDRESS1="0C:8C:DC:38:93:7E";
 	boolean found;
 
 	public Set< ShimmerDataSource > getShimmerDevices ()

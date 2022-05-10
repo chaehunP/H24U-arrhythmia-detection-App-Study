@@ -20,8 +20,6 @@ class ShimmerConnectDevice extends ShimmerDataSource
 	 //private static final UUID 		NG_SERVICE_UUID 					= UUID.fromString("61353090-8231-49cc-b57a-886370740041");   // unknown service
 	 //private static final UUID 		NG_WRITE_CHARACTERISTIC_UUID 		= UUID.fromString("17816557-5652-417f-909f-3aee61e5fa85");   // unknown characteristic
 
-
-
 	// @formatter:off
     private static final byte SHIMMER_DATA_PACKET = (byte) 0x00,
 	    SHIMMER_ACK = (byte) 0xFF, SHIMMER_START_TRANSFER = (byte) 0x07,
@@ -54,14 +52,13 @@ class ShimmerConnectDevice extends ShimmerDataSource
 
 	private final BluetoothDevice	mmDevice;
 	private BluetoothSocket			mmSocket, mmSocket1, mmSocket2, mmSocket3;
-	private InputStream				mmInStream;
+	public static InputStream		mmInStream;
 	private OutputStream			mmOutStream;
 	private Thread					mmThread;
 	private String					mmID;
-	private ShimmerData				mData;
-
-	private byte[]					mBuffer;
-	private int						mBufferWritePos;
+	public static   ShimmerData		mData;
+	public static byte[]			mBuffer;
+	public static int				mBufferWritePos;
 	private int						mBufferFillCount;
 
 	private int						mChannelCount;
@@ -76,6 +73,8 @@ class ShimmerConnectDevice extends ShimmerDataSource
 		mBuffer = new byte[ BUFFER_SIZE ];
 		mBufferWritePos = 0;
 		mBufferFillCount = 0;
+
+
 	}
 
 	public String getID ()
@@ -97,6 +96,7 @@ class ShimmerConnectDevice extends ShimmerDataSource
 
 
 			mmSocket.connect();
+
 
 
 
@@ -228,12 +228,12 @@ class ShimmerConnectDevice extends ShimmerDataSource
 		{
 			try
 			{
-				bytes = mmInStream.read( buffer, 0, BUFFER_SIZE - mBufferFillCount );
+				bytes = mmInStream.read(buffer, 0, BUFFER_SIZE - mBufferFillCount);
 
 				if (bytes > 0)
 				{
 					if (bytes <= (BUFFER_SIZE - mBufferWritePos))
-						System.arraycopy( buffer, 0, mBuffer, mBufferWritePos, bytes );
+						System.arraycopy(buffer, 0, mBuffer, mBufferWritePos, bytes);
 					else
 					{
 						System.arraycopy( buffer, 0, mBuffer, mBufferWritePos, (BUFFER_SIZE - mBufferWritePos) );

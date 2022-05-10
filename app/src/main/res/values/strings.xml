@@ -11,9 +11,9 @@
     <string name="menuTest">Test Record</string>
 
 
-                 <string-array name="arrayDataSourcesInt">
-                     <item>blue</item>
-                     <item>test</item>
+    <string-array name="arrayDataSourcesInt">
+        <item>blue</item>
+        <item>test</item>
         <item>100</item>
         <item>101</item>
         <item>102</item>

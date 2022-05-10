@@ -48,6 +48,7 @@ dependencies {
     implementation 'com.kyleduo.switchbutton:library:2.1.0'
     implementation 'com.android.support:multidex:2.0.1'
     //implementation 'net.sourceforge.jexcelapi:jxl:2.6.12'
+    implementation 'com.akexorcist:bluetoothspp:1.0.0'
 }
 
 

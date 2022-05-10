@@ -29,14 +29,14 @@ class BiomobiusDevice extends ShimmerDataSource
 
 	private final BluetoothDevice	mmDevice;
 	private BluetoothSocket			mmSocket;
-	private InputStream				mmInStream;
+	public static InputStream		mmInStream;
 	private OutputStream			mmOutStream;
 	private Thread					mmThread;
 	private String					mmID;
-	private ShimmerData				mData;
+	public static ShimmerData		mData;
 
 	private byte[]					mBuffer;
-	private int						mBufferWritePos;
+	public static int				mBufferWritePos;
 	private int						mBufferFillCount;
 
 

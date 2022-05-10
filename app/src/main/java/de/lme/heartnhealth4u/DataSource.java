@@ -20,9 +20,11 @@
  */
 package de.lme.heartnhealth4u;
 
+import android.os.Environment;
 import android.text.TextUtils;
-import android.util.SparseIntArray;
 import android.util.Log;
+import android.util.SparseIntArray;
+
 import junit.framework.Assert;
 
 import java.io.BufferedInputStream;
@@ -78,8 +80,7 @@ public class DataSource {
 	 *
 	 *            각 샘플을 곱할 배율 인수입니다. 기본값은 1입니다. 이것을 0으로 설정하면 잘못된 매개변수 예외.
 	 */
-	public int load(String signalFile, String annotationFile,
-		int maxSamples, int leadColumn, int scale) {
+	public int load(String signalFile, String annotationFile, int maxSamples, int leadColumn, int scale) {
 	    try {
 		File fs = new File(signalFile);
 		File fa = new File(annotationFile);
@@ -291,15 +292,13 @@ public class DataSource {
      * @return A Plot1D object ready to use.
 	 * 			  (AsyncTask) 객체 리스너는 사용할 준비가 된 Plot1D 객체로 진행률이 업데이트됩니다.
      */
-    public static Plot1D create(String filePath, char delimiter,
-								int firstColumn, int secondColumn, int numHeaderLines,
-								PlotView.PlotProgressListener progressListener) {
+    public static Plot1D create(String filePath, char delimiter, int firstColumn, int secondColumn, int numHeaderLines, PlotView.PlotProgressListener progressListener) {
 	Plot1D plot = null;
 
 	Assert.assertTrue(firstColumn < secondColumn);
 
 	try {
-	    File f = new File(filePath);
+	    File f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "mitdb" + "sig.csv" );
 
 	    long val1;
 	    float val2;

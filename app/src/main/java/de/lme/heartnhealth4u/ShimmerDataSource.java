@@ -9,6 +9,7 @@ public abstract class ShimmerDataSource
 
 	public static interface OnShimmerDataListener
 	{
+
 		abstract void onShimmerData (ShimmerData data);
 	}
 
