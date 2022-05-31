@@ -56,10 +56,6 @@ import de.lme.plotview.SamplingPlot;
 
 
 public class HeartyActivity extends AppCompatActivity implements IShimmerSimServiceCallback {
-
-//	private BluetoothSPP bt;
-
-
 	public static final String TAG = ".HeartyActivity";
 
 	private static final int DIALOG_EXIT = 1;

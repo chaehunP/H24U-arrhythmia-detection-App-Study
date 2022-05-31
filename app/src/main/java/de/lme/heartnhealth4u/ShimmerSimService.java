@@ -277,6 +277,7 @@ public class ShimmerSimService extends Service implements OnShimmerDataListener
 					{
 //						ShimmerSimService.this.getFilesDir() -> data/data/de.lme.heartnhealth4u, 내부 저장소 파일 접근, 임의로 사용자가 컨트롤 안됨
 //						Environment.getExternalStorageDirectory().getAbsolutePath() -> 앱 외부 절대 경로
+//						Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS
 						File sigFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "mitdb" + m_con.dataSource
 								+ "sig.csv" );
 						File annFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "mitdb" + m_con.dataSource
