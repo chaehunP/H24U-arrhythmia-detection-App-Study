@@ -11,3 +11,5 @@ https://github.com/gradlman/hearty.git - 참조
 앱에서 원하는 번호의 데이터를 이용하여 PVC 판별 가능
 
 아두이노 ECG 및 HC-06 모듈을 통해 실기간 심전도 데이터 획득 기능 추가
+
+실시간 획득된 데이터를 csv파일로 저장하는 기능 추가(MITBIH sig파일 형태로 저장)
