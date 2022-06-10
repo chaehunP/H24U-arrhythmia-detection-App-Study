@@ -32,18 +32,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HeartNHealth4U">
         <activity
+            android:name=".SplashActivity"
+            android:theme="@style/SplashTheme"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".Realtimedata"
             android:exported="true" />
         <activity
             android:name=".HeartyActivity"
             android:exported="true">
-
             <!-- android:theme="@style/Theme.AppCompat.Light" -->
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <service

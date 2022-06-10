@@ -6,4 +6,7 @@
         <!--<item name="colorPrimary">#FFFFFF</item> -->
         <!-- Customize your theme here. -->
     </style>
+    <style name="SplashTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:windowBackground">@drawable/splash</item>
+    </style>
 </resources>
