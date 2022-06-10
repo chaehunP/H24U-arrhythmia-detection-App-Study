@@ -2,7 +2,7 @@ package de.lme.heartnhealth4u;
 
 
 import static de.lme.heartnhealth4u.BluetoothSPP.DATA;
-import static de.lme.heartnhealth4u.BluetoothSPP.readMessage;
+import static de.lme.heartnhealth4u.BluetoothSPP.title;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -101,7 +101,7 @@ public class Realtimedata extends AppCompatActivity {
 
     @SuppressLint("NewApi")
     private void saveCsv(boolean addDate) {
-        if (readMessage == null) {
+        if (DATA == null) {
             Toast.makeText(this, "No data to write...", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -114,11 +114,28 @@ public class Realtimedata extends AppCompatActivity {
                 BufferedOutputStream fo = new BufferedOutputStream(new FileOutputStream(file, false));  // BufferedOutputStream: byte단위로 파일을 기록할 때 사용하는 버퍼 스트림
                 StringBuilder sb = new StringBuilder();  // 긴 문자열을 더하는 상황이 발생할 때 StringBuilder 사용
                                                          // String은 불변값, StringBuilder, StringBuffer은 가변값
-                                                         // StringBuilder은 가변값이기 때문에 get(), add() 함수를 이용하여 값을 변경할 수 있음
-                for(int i=0; i<DATA.size(); i++) {
-                    sb.append(DATA.get(i)).append(',');  // 리스트의 값 꺼내기 get함수
+                                                         // StringBuilder은 가변값이기 때문에 get(), add() 함수를 이용하여 값을 변경할 수 있음, 성능적으로 뛰어남
+                for (int i = 0; i < title.size(); i++) {
+                    sb.append(title.get(i)).append(',');
+                    if (i == 2) {
+                        break;
+                    }
+                }
+
+                sb.append('\n');
+
+                for (int n = 0; n < DATA.size(); n++) {
+                    sb.append(n).append(',');
+                    sb.append(DATA.get(n)).append(',');
                     sb.append('\n');
                 }
+
+//                for (int k = 0; k < DATA.size(); k++) {
+//                    sb.append(',');
+//                    sb.append(DATA.get(k)).append(',');  // get() -> 리스트 값 꺼내기
+//                    sb.append('\n');
+//                }
+
 
                 fo.write(sb.toString().getBytes("UTF-8"));  // 문자열을 바이트 배열로 변환해서 파일에 저장
                 fo.flush();
@@ -148,7 +165,6 @@ public class Realtimedata extends AppCompatActivity {
             }
         }
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
