@@ -9,4 +9,6 @@
 + **아두이노 ECG 모듈을 앱과 연동시켜 실시간 심박수를 화면에 보여주고, 이렇게 얻은 데이터를 CSV 파일에   
 저장하는 기능을 구현했습니다.**
 + **데이터는 MITBIH signal 파일 형태로 저장됩니다.**
-
+---
+<br/>
+<img width="70%" src="https://user-images.githubusercontent.com/95847909/215762065-c09b4177-eb0e-4cc3-a9ba-35a73a682d8b.gif"/>
